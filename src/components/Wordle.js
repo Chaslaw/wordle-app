@@ -1,0 +1,43 @@
+import React, { useState } from 'react'
+import { useEffect } from 'react'
+import useWordle from '../hooks/useWordle'
+import Grid from './Grid'
+import Keypad from './Keypad'
+import Message from './Message'
+
+export default function Wordle({solution}) {
+
+const {currentGuess, handleKeyUp, guesses, isCorrect, turn, usedKeys} = useWordle(solution)
+const [showMessage, setShowMessage] = useState(false)
+
+useEffect(() => {
+    window.addEventListener('keyup', handleKeyUp)
+
+    if (isCorrect) {
+      setTimeout(() => setShowMessage(true), 2000)
+      window.removeEventListener('keyup', handleKeyUp)
+
+    }
+
+    if (turn > 5) {
+      setTimeout(() => setShowMessage(true), 2000)
+      window.removeEventListener('keyup', handleKeyUp)
+
+    }
+
+    return () => window.removeEventListener('keyup', handleKeyUp)
+}, [handleKeyUp, isCorrect, turn])
+
+
+
+  return (
+    <div>
+     
+       <Grid currentGuess={currentGuess} guesses={guesses} turn={turn}/>
+       <Keypad usedKeys={usedKeys}/>
+       {showMessage && <Message isCorrect={isCorrect} turn={turn} solution={solution}/>}
+       
+    </div>
+   
+  )
+}
